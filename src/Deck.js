@@ -18,6 +18,9 @@ function Deck() {
 
     
     async function drawCard() {
+        if(deck.length >= 52){
+            return alert("Error: no cards remaining!");
+        }
         try {
             console.log('drawing card...');
             const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId.current}/draw/`);
@@ -33,7 +36,7 @@ function Deck() {
     
     return (
         <div>
-            {deck.length < 52 && <button onClick={() => drawCard()}>Give me a card!</button>}
+            <button onClick={() => drawCard()}>Give me a card!</button>
             {renderedDeck}
         </div>
     );
