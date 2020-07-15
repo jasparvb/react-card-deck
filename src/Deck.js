@@ -6,8 +6,10 @@ import axios from "axios";
 
 function Deck() {
     const [deck, setDeck] = useState([]);
+    const [drawing, setDrawing] = useState(false);
 
     let deckId = useRef();
+    let timerId = useRef();
 
     useEffect(() => {
         async function getDeck() {
@@ -16,28 +18,43 @@ function Deck() {
         }
         getDeck();
     },[]);
-
     
-    async function drawCard() {
-        if(deck.length >= 52){
-            return alert("Error: no cards remaining!");
+    useEffect(() => {
+        if(drawing){
+            drawCard();
+            timerId.current = setInterval(() => {
+              drawCard();
+            }, 1000);
+        
+            return () => {
+              clearInterval(timerId.current)
+            }
         }
+    }, [drawing]);
+       
+    async function drawCard() {
         try {
-            console.log('drawing card...');
             const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId.current}/draw/`);
+            if (res.data.remaining === 0) {
+                setDrawing(false);
+                throw new Error("Error: no cards remaining!");
+            }
             const {image, code} = res.data.cards[0];
             setDeck(oldDeck => [...oldDeck, {image, code}]);
         } catch (e) {
-            console.log("Error drawing card");
+            alert(e);
         }
-        
+    }
+
+    function toggleDrawing() {
+        setDrawing(drawing => !drawing);
     }
 
     const renderedDeck = deck.map(card => <Card key={card.code} url={card.image}/>);
     
     return (
         <div className="Deck">
-            <button className="Deck-Btn" onClick={() => drawCard()}>Give me a card!</button>
+            <button className="Deck-Btn" onClick={() => toggleDrawing()}>{drawing ? "Stop drawing" : "Start drawing"}</button>
             {renderedDeck}
         </div>
     );
