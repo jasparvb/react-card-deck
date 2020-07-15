@@ -1,7 +1,10 @@
 import React, {useState, useEffect, useRef} from 'react';
+import Card from './Card';
+import axios from "axios";
+
 
 function Deck() {
-    [deck, setDeck] = useState([]);
+    const [deck, setDeck] = useState([]);
 
     let deckId = useRef();
 
@@ -14,13 +17,14 @@ function Deck() {
     },[]);
 
     const renderedDeck = () => {
-        deck.map(img => <Card img={img}/>);
+        deck.map(card => <Card key={card.code} url={card.url}/>);
     }
 
     async function drawCard() {
         try {
+            console.log('drawing card...');
             const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId.current}/draw/`);
-            setDeck([...deck, res.cards.image]);
+            setDeck([...deck, {url: res.cards.image, code: res.cards.code}]);
         } catch (e) {
             console.log("Error drawing card");
         }
@@ -29,7 +33,7 @@ function Deck() {
 
     return (
         <div>
-            {deck.length <= 52 && <button onClick={() => drawCard()}>Give me a card!</button>}
+            {deck.length < 52 && <button onClick={() => drawCard()}>Give me a card!</button>}
             {renderedDeck}
         </div>
     );
