@@ -10,27 +10,27 @@ function Deck() {
 
     useEffect(() => {
         async function getDeck() {
-            const res = await axios.get("https://deckofcardsapi.com/api/deck/new/");
-            deckId.current = res.deck_id;
+            const res = await axios.get("https://deckofcardsapi.com/api/deck/new/shuffle/");
+            deckId.current = res.data.deck_id;
         }
         getDeck();
     },[]);
 
-    const renderedDeck = () => {
-        deck.map(card => <Card key={card.code} url={card.url}/>);
-    }
-
+    
     async function drawCard() {
         try {
             console.log('drawing card...');
             const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId.current}/draw/`);
-            setDeck([...deck, {url: res.cards.image, code: res.cards.code}]);
+            const {image, code} = res.data.cards[0];
+            setDeck(oldDeck => [...oldDeck, {image, code}]);
         } catch (e) {
             console.log("Error drawing card");
         }
-
+        
     }
 
+    const renderedDeck = deck.map(card => <Card key={card.code} url={card.image}/>);
+    
     return (
         <div>
             {deck.length < 52 && <button onClick={() => drawCard()}>Give me a card!</button>}
