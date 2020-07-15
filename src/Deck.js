@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import Card from './Card';
+import './Deck.css';
 import axios from "axios";
 
 
@@ -35,8 +36,8 @@ function Deck() {
     const renderedDeck = deck.map(card => <Card key={card.code} url={card.image}/>);
     
     return (
-        <div>
-            <button onClick={() => drawCard()}>Give me a card!</button>
+        <div className="Deck">
+            <button className="Deck-Btn" onClick={() => drawCard()}>Give me a card!</button>
             {renderedDeck}
         </div>
     );
